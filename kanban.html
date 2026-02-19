@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Kanban Clientes</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    #kanban {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .coluna {
+      flex: 1;
+      background: #ffffff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .card {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      background: #fafafa;
+      cursor: pointer;
+    }
+
+    .card button {
+      margin-top: 5px;
+      font-size: 11px;
+    }
+
+    #perfil {
+      margin-top: 40px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+
+    @media (max-width: 900px) {
+      #kanban {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>Kanban de Clientes – Alto Padrão</h2>
+<button onclick="novoCliente()">+ Novo Cliente</button>
+
+<div id="kanban"></div>
+
+<div id="perfil"></div>
+
+<script>
+
+let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+
+const colunas = [
+  "Premium Ativo",
+  "Premium Morno",
+  "Investidor",
+  "Relacionamento"
+];
+
+function novoCliente() {
+  clientes.push({
+    id: Date.now(),
+    nome: "Novo Cliente",
+    status: "Relacionamento"
+  });
+  render();
+localStorage.setItem("clientes", JSON.stringify(clientes));
+}
+
+function mover(id, status) {
+  clientes = clientes.map(c =>
+    c.id === id ? {...c, status} : c
+  );
+  render();
+localStorage.setItem("clientes", JSON.stringify(clientes));
+}
+
+function abrirPerfil(cliente) {
+  document.getElementById("perfil").innerHTML = `
+    <h3>Perfil do Cliente</h3>
+    <input placeholder="Nome" value="${cliente.nome || ""}" onchange="atualizar(${cliente.id}, 'nome', this.value)">
+    <input placeholder="Módulo" value="${cliente.modulo || ""}" onchange="atualizar(${cliente.id}, 'modulo', this.value)">
+    <input placeholder="Dormitórios" value="${cliente.dormitorios || ""}" onchange="atualizar(${cliente.id}, 'dormitorios', this.value)">
+    <input placeholder="Suítes" value="${cliente.suites || ""}" onchange="atualizar(${cliente.id}, 'suites', this.value)">
+    <input placeholder="Preço" value="${cliente.preco || ""}" onchange="atualizar(${cliente.id}, 'preco', this.value)">
+    <input placeholder="Metros quadrados" value="${cliente.metros || ""}" onchange="atualizar(${cliente.id}, 'metros', this.value)">
+    <input placeholder="Padrão" value="${cliente.padrao || ""}" onchange="atualizar(${cliente.id}, 'padrao', this.value)">
+    <input placeholder="Quadra de tênis?" value="${cliente.quadra || ""}" onchange="atualizar(${cliente.id}, 'quadra', this.value)">
+    <textarea rows="6" placeholder="Feedback detalhado"
+      onchange="atualizar(${cliente.id}, 'feedback', this.value)">${cliente.feedback || ""}</textarea>
+  `;
+}
+
+function atualizar(id, campo, valor) {
+  clientes = clientes.map(c =>
+    c.id === id ? {...c, [campo]: valor} : c
+  );
+
+  localStorage.setItem("clientes", JSON.stringify(clientes));
+}
+
+function render() {
+  const kanban = document.getElementById("kanban");
+  kanban.innerHTML = "";
+
+  colunas.forEach(col => {
+    const coluna = document.createElement("div");
+    coluna.className = "coluna";
+    coluna.innerHTML = `<h4>${col}</h4>`;
+
+    clientes.filter(c => c.status === col).forEach(cliente => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `<strong>${cliente.nome}</strong><br><br>`;
+
+      colunas.filter(c => c !== col).forEach(c => {
+        card.innerHTML += `
+          <button onclick="event.stopPropagation(); mover(${cliente.id}, '${c}')">
+            ${c}
+          </button><br>
+        `;
+      });
+
+      card.onclick = () => abrirPerfil(cliente);
+      coluna.appendChild(card);
+    });
+
+    kanban.appendChild(coluna);
+  });
+}
+
+render();
+
+</script>
+
+</body>
+</html>
