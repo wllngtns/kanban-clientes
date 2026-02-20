@@ -1,79 +1,113 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Kanban Clientes</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Energia CRM</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
-      background: #f5f5f5;
-    }
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111827">
 
-    #kanban {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
+<style>
 
-    .coluna {
-      flex: 1;
-      background: #ffffff;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+  font-size: 18px;
+}
 
-    .card {
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      background: #fafafa;
-      cursor: pointer;
-    }
+header {
+  background: #111827;
+  color: white;
+  padding: 18px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+}
 
-    .card button {
-      margin-top: 5px;
-      font-size: 11px;
-    }
+button {
+  font-size: 16px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
 
-    #perfil {
-      margin-top: 40px;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    }
+.novo-btn {
+  background: #111827;
+  color: white;
+  margin: 15px;
+}
 
-    input, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-    }
+#kanban {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+}
 
-    @media (max-width: 900px) {
-      #kanban {
-        flex-direction: column;
-      }
-    }
-  </style>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+.coluna {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.coluna h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.card {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.card strong {
+  font-size: 17px;
+}
+
+.perfil {
+  padding: 20px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+textarea {
+  min-height: 120px;
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+  #kanban {
+    flex-direction: column;
+  }
+}
+
+</style>
 </head>
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1f2937">
 
 <body>
 
-<h2>Kanban de Clientes – Alto Padrão</h2>
-<button onclick="novoCliente()">+ Novo Cliente</button>
+<header>Energia Imóveis CRM</header>
+
+<button class="novo-btn" onclick="novoCliente()">+ Novo Cliente</button>
 
 <div id="kanban"></div>
 
-<div id="perfil"></div>
+<div id="perfil" class="perfil"></div>
 
 <script>
 
@@ -86,36 +120,57 @@ const colunas = [
   "Relacionamento"
 ];
 
+function salvar() {
+  localStorage.setItem("clientes", JSON.stringify(clientes));
+}
+
 function novoCliente() {
   clientes.push({
     id: Date.now(),
     nome: "Novo Cliente",
     status: "Relacionamento"
   });
+  salvar();
   render();
-localStorage.setItem("clientes", JSON.stringify(clientes));
 }
 
 function mover(id, status) {
   clientes = clientes.map(c =>
     c.id === id ? {...c, status} : c
   );
+  salvar();
   render();
-localStorage.setItem("clientes", JSON.stringify(clientes));
 }
 
 function abrirPerfil(cliente) {
   document.getElementById("perfil").innerHTML = `
-    <h3>Perfil do Cliente</h3>
-    <input placeholder="Nome" value="${cliente.nome || ""}" onchange="atualizar(${cliente.id}, 'nome', this.value)">
-    <input placeholder="Módulo" value="${cliente.modulo || ""}" onchange="atualizar(${cliente.id}, 'modulo', this.value)">
-    <input placeholder="Dormitórios" value="${cliente.dormitorios || ""}" onchange="atualizar(${cliente.id}, 'dormitorios', this.value)">
-    <input placeholder="Suítes" value="${cliente.suites || ""}" onchange="atualizar(${cliente.id}, 'suites', this.value)">
-    <input placeholder="Preço" value="${cliente.preco || ""}" onchange="atualizar(${cliente.id}, 'preco', this.value)">
-    <input placeholder="Metros quadrados" value="${cliente.metros || ""}" onchange="atualizar(${cliente.id}, 'metros', this.value)">
-    <input placeholder="Padrão" value="${cliente.padrao || ""}" onchange="atualizar(${cliente.id}, 'padrao', this.value)">
-    <input placeholder="Quadra de tênis?" value="${cliente.quadra || ""}" onchange="atualizar(${cliente.id}, 'quadra', this.value)">
-    <textarea rows="6" placeholder="Feedback detalhado"
+    <h2>Perfil do Cliente</h2>
+
+    <input placeholder="Nome" value="${cliente.nome || ""}"
+      onchange="atualizar(${cliente.id}, 'nome', this.value)">
+
+    <input placeholder="Módulo" value="${cliente.modulo || ""}"
+      onchange="atualizar(${cliente.id}, 'modulo', this.value)">
+
+    <input placeholder="Dormitórios"
+      onchange="atualizar(${cliente.id}, 'dormitorios', this.value)">
+
+    <input placeholder="Suítes"
+      onchange="atualizar(${cliente.id}, 'suites', this.value)">
+
+    <input placeholder="Preço"
+      onchange="atualizar(${cliente.id}, 'preco', this.value)">
+
+    <input placeholder="Metros quadrados"
+      onchange="atualizar(${cliente.id}, 'metros', this.value)">
+
+    <input placeholder="Padrão"
+      onchange="atualizar(${cliente.id}, 'padrao', this.value)">
+
+    <input placeholder="Tem quadra de tênis?"
+      onchange="atualizar(${cliente.id}, 'quadra', this.value)">
+
+    <textarea placeholder="Feedback detalhado"
       onchange="atualizar(${cliente.id}, 'feedback', this.value)">${cliente.feedback || ""}</textarea>
   `;
 }
@@ -124,8 +179,7 @@ function atualizar(id, campo, valor) {
   clientes = clientes.map(c =>
     c.id === id ? {...c, [campo]: valor} : c
   );
-
-  localStorage.setItem("clientes", JSON.stringify(clientes));
+  salvar();
 }
 
 function render() {
@@ -135,7 +189,7 @@ function render() {
   colunas.forEach(col => {
     const coluna = document.createElement("div");
     coluna.className = "coluna";
-    coluna.innerHTML = `<h4>${col}</h4>`;
+    coluna.innerHTML = `<h3>${col}</h3>`;
 
     clientes.filter(c => c.status === col).forEach(cliente => {
       const card = document.createElement("div");
@@ -143,11 +197,7 @@ function render() {
       card.innerHTML = `<strong>${cliente.nome}</strong><br><br>`;
 
       colunas.filter(c => c !== col).forEach(c => {
-        card.innerHTML += `
-          <button onclick="event.stopPropagation(); mover(${cliente.id}, '${c}')">
-            ${c}
-          </button><br>
-        `;
+        card.innerHTML += `<button onclick="event.stopPropagation(); mover(${cliente.id}, '${c}')">${c}</button><br><br>`;
       });
 
       card.onclick = () => abrirPerfil(cliente);
@@ -160,13 +210,12 @@ function render() {
 
 render();
 
-</script>
-<script>
+/* SERVICE WORKER */
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
-</script>
-  <script>
+
+/* BOTÃO INSTALAR */
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -174,18 +223,14 @@ window.addEventListener('beforeinstallprompt', (e) => {
   deferredPrompt = e;
 
   const btn = document.createElement("button");
-  btn.innerText = "📲 Instalar Aplicativo";
+  btn.innerText = "📲 Instalar App";
   btn.style.position = "fixed";
   btn.style.bottom = "20px";
   btn.style.right = "20px";
-  btn.style.padding = "14px 18px";
-  btn.style.background = "#000";
-  btn.style.color = "#fff";
-  btn.style.border = "none";
+  btn.style.background = "#111827";
+  btn.style.color = "white";
+  btn.style.padding = "12px 16px";
   btn.style.borderRadius = "10px";
-  btn.style.fontSize = "16px";
-  btn.style.cursor = "pointer";
-  btn.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
 
   btn.onclick = async () => {
     deferredPrompt.prompt();
@@ -195,9 +240,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
   document.body.appendChild(btn);
 });
+
 </script>
+
 </body>
 </html>
-
-
-
