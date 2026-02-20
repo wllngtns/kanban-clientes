@@ -165,6 +165,37 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
 </script>
+  <script>
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  const btn = document.createElement("button");
+  btn.innerText = "📲 Instalar Aplicativo";
+  btn.style.position = "fixed";
+  btn.style.bottom = "20px";
+  btn.style.right = "20px";
+  btn.style.padding = "14px 18px";
+  btn.style.background = "#000";
+  btn.style.color = "#fff";
+  btn.style.border = "none";
+  btn.style.borderRadius = "10px";
+  btn.style.fontSize = "16px";
+  btn.style.cursor = "pointer";
+  btn.style.boxShadow = "0 4px 10px rgba(0,0,0,0.3)";
+
+  btn.onclick = async () => {
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    btn.remove();
+  };
+
+  document.body.appendChild(btn);
+});
+</script>
 </body>
 </html>
+
 
